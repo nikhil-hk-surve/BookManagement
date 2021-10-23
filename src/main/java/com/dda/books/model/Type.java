@@ -1,10 +1,13 @@
 package com.dda.books.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class Type {
@@ -14,42 +17,43 @@ public class Type {
     }
 
     public Type(Long id) {
-        this.id = id;
+        this.type_id = type_id;
     }
 
-    public Type(Long id, String typeName, BigDecimal discount) {
-        this.id = id;
+    public Type(Long type_id, String typeName, BigDecimal discount) {
+        this.type_id = type_id;
         this.typeName = typeName;
         this.discount = discount;
 
     }
 
     @Id
-    @GeneratedValue
-    @JsonProperty("type_id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "type_Generator")
+    @SequenceGenerator(name = "type_Generator", sequenceName = "type_seq", allocationSize = 500)
+    private Long type_id;
 
     private String typeName;
 
     private BigDecimal discount;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "type")
-    private List<Book> books;
+    private Set<Book> books=new HashSet<>();
 
-    public List<Book> getBooks() {
+    public Set<Book> getBooks() {
         return books;
     }
 
-    public void setBooks(List<Book> books) {
+    public void setBooks(Set<Book> books) {
         this.books = books;
     }
 
-    public Long getId() {
-        return id;
+    public Long getType_id() {
+        return type_id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setType_id(Long type_id) {
+        this.type_id = type_id;
     }
 
     public String getTypeName() {

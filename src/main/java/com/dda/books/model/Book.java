@@ -14,7 +14,8 @@ public class Book {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "book_Generator")
+    @SequenceGenerator(name = "book_Generator", sequenceName = "book_seq", allocationSize = 1000)
     private Long id;
 
     private String name;
@@ -23,9 +24,8 @@ public class Book {
 
     private String author;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="type_id")
-    @JsonProperty("type_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "type_id", referencedColumnName = "type_id")
     private Type type;
 
     private BigDecimal price;

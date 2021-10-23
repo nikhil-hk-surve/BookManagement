@@ -3,12 +3,13 @@ package com.dda.books.controller;
 import com.dda.books.model.Book;
 import com.dda.books.model.BookDto;
 import com.dda.books.model.CheckOutDto;
+import com.dda.books.model.Type;
 import com.dda.books.service.BookService;
 import com.dda.books.service.TypeService;
-import com.dda.books.util.BookDtoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -36,42 +37,48 @@ public class BookController {
     }
 
     @GetMapping(value="/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<BookDto> getAllBooks()
+    public List<Book> getAllBooks()
     {
-        BookDtoMapper mapper=new BookDtoMapper();
-        List<BookDto> list=new ArrayList<>();
-         List<Book> books=bookService.getAllBooks();
-         for(Book bk:books)
-         {
-             BookDto dto= mapper.mapBookDto(bk);
-             list.add(dto);
-         }
-
-         return list;
+        return bookService.getAllBooks();
 
     }
 
     //@RequestMapping(value="/save", method = RequestMethod.POST)
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public BookDto save(@RequestBody Book book) {
-        BookDtoMapper mapper=new BookDtoMapper();
+
         BookDto dto=new BookDto();
         try {
+            if(book.getType()!=null) {
+                Optional<Type> type = typeService.getType(book.getType().getType_id());
+                if (!type.isPresent() && !StringUtils.isEmpty(book.getType().getTypeName())) {
+                    Type tp=book.getType();
+                    //typeService.save(tp);
+                    book.setType(tp);
+                    dto.setError("None");
+                }else if(!type.isPresent())
+                {
+                    book.setType(null);
+                    dto.setError("Record created with No Type");
+                }else if(type.isPresent())
+                {
+                    book.setType(type.get());
+                    dto.setError("None");
+                }
+            }
+
             bookService.save(book);
             Optional<Book> resp=bookService.getBook(book.getId());
-            dto=mapper.mapBookDto(resp.get());
+            dto.setBook(resp.orElse(book));
         }catch (SQLException se)
         {
             dto.setError(se.getMessage());
+        }catch(Exception ex)
+        {
+            dto.setError("Unknown Error: "+ex.getMessage());
         }
 
         return dto;
-    }
-
-    @PostMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public BookDto update(@RequestBody Book book)
-    {
-        return save(book);
     }
 
     @PostMapping(value = "/delete/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)

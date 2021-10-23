@@ -20,13 +20,15 @@ public class BookServiceImpl implements BookService{
 
     @Override
     public Optional<Book> getBook(Long id) {
+
         return repository.findById(id);
     }
 
     @Override
     public Book save(Book book) throws SQLException {
         try {
-            repository.saveAndFlush(book);
+            repository.save(book);
+            repository.flush();
         }catch (Exception ex){
             if(ex instanceof DataIntegrityViolationException)
             {
