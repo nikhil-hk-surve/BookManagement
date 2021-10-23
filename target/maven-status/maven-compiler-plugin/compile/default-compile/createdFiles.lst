@@ -1,0 +1,6 @@
+com\dda\books\service\BookServiceImpl.class
+com\dda\books\Application.class
+com\dda\books\model\Book.class
+com\dda\books\service\BookService.class
+com\dda\books\controller\BookController.class
+com\dda\books\dao\BookRepository.class
