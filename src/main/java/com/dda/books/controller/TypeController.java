@@ -19,14 +19,14 @@ public class TypeController {
     @Autowired
     TypeService typeService;
 
-    @PostMapping(value="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getType(@PathVariable Long id)
     {
         Optional<Type> optionaltype= typeService.getType(id);
         return optionaltype.isPresent()?ResponseEntity.of(optionaltype):ResponseEntity.ok("No type with this ID Available");
     }
 
-    @PostMapping(value="/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value="/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getAllTypes()
     {
         List<Type> types=typeService.getAllTypes();
@@ -35,32 +35,24 @@ public class TypeController {
 
     //@RequestMapping(value="/save", method = RequestMethod.POST)
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void save(@RequestBody Type type)
+    public Type save(@RequestBody Type type)
     {
-
-            typeService.save(type);
+        return typeService.save(type);
 
     }
 
     @PostMapping(value = "/delete/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String delete(@PathVariable Long id)
+    public void delete(@PathVariable Long id)
     {
         typeService.delete(id);
 
-        return "type Record "+id+" Deleted";
     }
 
     @PostMapping(value = "/deleteAll", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String deleteAll()
+    public void deleteAll()
     {
         typeService.deleteAll();
 
-        return "All types are Deleted";
     }
 
-
-
-
-
-    
 }

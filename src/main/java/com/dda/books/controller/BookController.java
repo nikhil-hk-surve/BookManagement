@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,22 +50,26 @@ public class BookController {
 
         BookDto dto=new BookDto();
         try {
-            if(book.getType()!=null) {
-                Optional<Type> type = typeService.getType(book.getType().getType_id());
-                if (!type.isPresent() && !StringUtils.isEmpty(book.getType().getTypeName())) {
-                    Type tp=book.getType();
-                    //typeService.save(tp);
-                    book.setType(tp);
-                    dto.setError("None");
-                }else if(!type.isPresent())
+            Type tp=book.getType();
+            if(tp!=null && tp.getType_id()!=null) {
+                Optional<Type> type = typeService.getType(tp.getType_id());
+                if(!type.isPresent() && !StringUtils.isEmpty(tp.getTypeName()))
                 {
+                    tp.setType_id(null);
+                    book.setType(tp);
+                    dto.setError("Record created might have different Type_id. Use /book/{id} to check");
+                }else if(!type.isPresent()){
                     book.setType(null);
                     dto.setError("Record created with No Type");
-                }else if(type.isPresent())
+                }else
                 {
                     book.setType(type.get());
                     dto.setError("None");
                 }
+            }else if (tp!=null && !StringUtils.isEmpty(tp.getTypeName())) {
+
+                book.setType(tp);
+                dto.setError("None");
             }
 
             bookService.save(book);
@@ -82,23 +87,21 @@ public class BookController {
     }
 
     @PostMapping(value = "/delete/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String delete(@PathVariable Long id)
+    public void delete(@PathVariable Long id)
     {
         bookService.delete(id);
 
-        return "Book Record "+id+" Deleted";
     }
 
     @PostMapping(value = "/deleteAll", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String deleteAll()
+    public void deleteAll()
     {
         bookService.deleteAll();
 
-        return "All Books are Deleted";
     }
 
     @PostMapping(value = "/checkout", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CheckOutDto getDiscount()
+    public CheckOutDto checkout()
     {
         CheckOutDto chk=new CheckOutDto();
         List<Book> list=bookService.getAllBooks();
@@ -117,7 +120,7 @@ public class BookController {
 
         chk.setDiscountedPrice(discountedAmount);
         chk.setTotalAmount(total);
-        chk.setTotalDiscount(total.subtract(discountedAmount).divide(total,2).multiply(new BigDecimal(100)));
+        chk.setTotalDiscount((total.subtract(discountedAmount)).divide(total,2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
         return chk;
     }
 

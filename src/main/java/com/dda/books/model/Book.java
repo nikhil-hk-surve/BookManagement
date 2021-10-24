@@ -13,6 +13,16 @@ public class Book {
     public Book() {
     }
 
+    public Book(Long id, String name, String description, String author, Type type, BigDecimal price, String isbn) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.author = author;
+        this.type = type;
+        this.price = price;
+        this.isbn = isbn;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "book_Generator")
     @SequenceGenerator(name = "book_Generator", sequenceName = "book_seq", allocationSize = 1000)
@@ -24,11 +34,11 @@ public class Book {
 
     private String author;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "type_id", referencedColumnName = "type_id")
     private Type type;
 
-    private BigDecimal price;
+    private BigDecimal price=new BigDecimal(0);
 
     private String isbn;
 
@@ -87,5 +97,18 @@ public class Book {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", author='" + author + '\'' +
+                ", type=" + type +
+                ", price=" + price +
+                ", isbn='" + isbn + '\'' +
+                '}';
     }
 }

@@ -10,7 +10,7 @@ public interface TypeService {
 
     public List<Type> getAllTypes();
 
-    public void save(Type type);
+    public Type save(Type type);
 
     public void delete(Long id);
 

@@ -34,7 +34,7 @@ public class Type {
 
     private String typeName;
 
-    private BigDecimal discount;
+    private BigDecimal discount=new BigDecimal(0);
 
     @JsonIgnore
     @OneToMany(mappedBy = "type")
@@ -70,5 +70,14 @@ public class Type {
 
     public void setDiscount(BigDecimal discount) {
         this.discount = discount;
+    }
+
+    @Override
+    public String toString() {
+        return "Type{" +
+                "type_id=" + type_id +
+                ", typeName='" + typeName + '\'' +
+                ", discount=" + discount +
+                '}';
     }
 }

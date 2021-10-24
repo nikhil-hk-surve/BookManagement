@@ -25,9 +25,10 @@ public class TypeServiceImpl implements TypeService{
     }
 
     @Override
-    public void save(Type type) {
+    public Type save(Type type) {
 
         typeRepository.save(type);
+        return type;
     }
 
     @Override

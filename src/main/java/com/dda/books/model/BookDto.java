@@ -28,5 +28,11 @@ public class BookDto implements Serializable {
         this.error = error;
     }
 
-
+    @Override
+    public String toString() {
+        return "{" +
+                "book=" + book +
+                ", error='" + error + '\'' +
+                '}';
+    }
 }
