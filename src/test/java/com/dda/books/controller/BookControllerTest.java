@@ -8,6 +8,7 @@ import com.dda.books.model.CheckOutDto;
 import com.dda.books.model.Type;
 import com.dda.books.service.BookService;
 import com.dda.books.service.TypeService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -175,5 +176,25 @@ public class BookControllerTest {
 
         JSONAssert.assertEquals(chkResp,mvcResult.getResponse().getContentAsString(),false);
     }
+
+    @Ignore
+    @Test
+    public void checkoutListTest() throws Exception {
+        CheckOutDto dto=new CheckOutDto();
+
+        List<Book> list=new ArrayList<>();
+        list.add(book);
+
+        Mockito.when(bookService.getBook(Mockito.anyLong())).thenReturn(Optional.ofNullable(book));
+
+        RequestBuilder requestBuilder= MockMvcRequestBuilders.post("/rest/book/checkoutList/promotion/Fantasy-20")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .content(resultList).contentType(MediaType.APPLICATION_JSON_VALUE);
+
+        MvcResult mvcResult=mvc.perform(requestBuilder).andReturn();
+
+        JSONAssert.assertEquals(chkResp,mvcResult.getResponse().getContentAsString(),false);
+    }
+
 
 }
