@@ -90,7 +90,6 @@ public class BookController {
     public void delete(@PathVariable Long id)
     {
         bookService.delete(id);
-
     }
 
     @PostMapping(value = "/deleteAll", consumes = MediaType.APPLICATION_JSON_VALUE)
