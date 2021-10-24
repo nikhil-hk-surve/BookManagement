@@ -10,7 +10,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @SpringBootApplication
 @EnableWebMvc
-//@ComponentScan(basePackages = "com.dda.books")
 public class Application {
 
     public static void main(String a[]){
