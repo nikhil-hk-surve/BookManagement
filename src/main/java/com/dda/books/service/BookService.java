@@ -18,5 +18,5 @@ public interface BookService {
 
     public void deleteAll();
 
-    //public void update(Book book);
+    public List<Book> findAllById(List<Long> ids);
 }

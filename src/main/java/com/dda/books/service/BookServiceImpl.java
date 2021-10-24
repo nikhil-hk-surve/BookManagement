@@ -21,6 +21,7 @@ public class BookServiceImpl implements BookService{
     @Override
     public Optional<Book> getBook(Long id) {
 
+
         return repository.findById(id);
     }
 
@@ -54,6 +55,10 @@ public class BookServiceImpl implements BookService{
         repository.deleteAll();
     }
 
+    @Override
+    public List<Book> findAllById(List<Long> ids) {
+        return repository.findAllById(ids);
+    }
 
 
 }

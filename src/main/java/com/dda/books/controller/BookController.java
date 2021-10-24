@@ -102,25 +102,77 @@ public class BookController {
     @PostMapping(value = "/checkout", produces = MediaType.APPLICATION_JSON_VALUE)
     public CheckOutDto checkout()
     {
-        CheckOutDto chk=new CheckOutDto();
         List<Book> list=bookService.getAllBooks();
+        return calculateCheckoutItems(list, null);
+    }
+
+    @PostMapping(value = "/checkoutList/promotion/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CheckOutDto checkoutlist(@RequestBody List<Book> list, @PathVariable String code)
+    {
+        return calculateCheckoutItems(list, code);
+    }
+
+    private CheckOutDto calculateCheckoutItems(List<Book> list, String code)
+    {
+        CheckOutDto dto=new CheckOutDto();
         BigDecimal discountedAmount=new BigDecimal(0);
         BigDecimal bkAmt=new BigDecimal(0);
         BigDecimal disc=new BigDecimal(0);
         BigDecimal total=new BigDecimal(0);
+        String type=null;
+        BigDecimal promoDisc = new BigDecimal(0);
 
-        for(Book bk:list)
-        {
-            bkAmt=bk.getPrice();
-            disc=bk.getType().getDiscount();
-            discountedAmount=discountedAmount.add(bkAmt.multiply(new BigDecimal(100).subtract(disc)).divide(new BigDecimal(100),2));
-            total=total.add(bkAmt);
+        List<Long> ids=new ArrayList<>();
+
+        try {
+        list.forEach(book->{
+            ids.add(book.getId());
+        });
+
+        if(!StringUtils.isEmpty(code)) {
+            List<Book> bkList=bookService.findAllById(ids);
+            if(bkList.size()!=list.size())
+            {
+                throw new Exception("Few books are not in the system");
+            }
+            String[] promo = code.split("-");
+            if(promo.length>1) {
+                type = promo[0];
+                promoDisc = new BigDecimal(promo[1]);
+            }
         }
 
-        chk.setDiscountedPrice(discountedAmount);
-        chk.setTotalAmount(total);
-        chk.setTotalDiscount((total.subtract(discountedAmount)).divide(total,2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
-        return chk;
+
+            if (list.size() >= 1) {
+                for (Book bk : list) {
+                    bkAmt = bk.getPrice();
+                    if (bk.getType() == null || (bk.getType() != null && (StringUtils.isEmpty(bk.getType().getTypeName())
+                            || bk.getType().getDiscount().equals(0)))) {
+                        Optional<Book> book = bookService.getBook(bk.getId());
+                        bk.setType(book.get().getType());
+                    }
+                    disc = bk.getType().getDiscount();
+
+                    if (type != null && type.equalsIgnoreCase(bk.getType().getTypeName())) {
+                        discountedAmount = discountedAmount.add(bkAmt.multiply(new BigDecimal(100).subtract(promoDisc)).divide(new BigDecimal(100), 2));
+
+                    } else {
+                        discountedAmount = discountedAmount.add(bkAmt.multiply(new BigDecimal(100).subtract(disc)).divide(new BigDecimal(100), 2));
+
+                    }
+                    total = total.add(bkAmt);
+                }
+
+                dto.setDiscountedPrice(discountedAmount);
+                dto.setTotalAmount(total);
+                dto.setTotalDiscount((total.subtract(discountedAmount)).divide(total, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
+            }
+        }catch(Exception ex)
+        {
+            dto.setError("Exception Occurred. Please check if any Book/Type is Valid ");
+        }
+
+            return dto;
     }
 
 }

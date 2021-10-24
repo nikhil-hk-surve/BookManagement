@@ -5,11 +5,21 @@ import java.math.BigDecimal;
 
 public class CheckOutDto implements Serializable {
 
-    private BigDecimal totalAmount;
+    private BigDecimal totalAmount=new BigDecimal(0);
 
-    private BigDecimal discountedPrice;
+    private BigDecimal discountedPrice=new BigDecimal(0);
 
-    private BigDecimal totalDiscount;
+    private BigDecimal totalDiscount=new BigDecimal(0);
+
+    private String error;
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
 
     public BigDecimal getTotalAmount() {
         return totalAmount;
