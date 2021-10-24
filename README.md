@@ -76,4 +76,11 @@
 ####Desc: deletes all the types from Type table
 
 ##Docker Build Command
-###docker build -t springio/gs-spring-boot-docker.
+###docker build -f Dockerfile -t bookmanagement
+###docker run -p 8080:8080 bookmanagement
+
+##DataBase details
+###Url: http://localhost:8080/h2
+###User Name: sa
+###Password: sa
+###Jdbc Url: jdbc:h2:mem:books
